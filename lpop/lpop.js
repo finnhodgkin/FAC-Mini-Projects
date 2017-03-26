@@ -30,8 +30,7 @@ if (cl.add) {
   save(n, 'Re-randomised lpop list.');
 
 } else {
-  lpop();
-
+  lpop()
 }
 
 // ---- lpop functionality below ---- //
@@ -64,13 +63,24 @@ function save (json, message) {
   });
 }
 
-function lpop () {
+function lpop (cb) {
   // when no more random name repopulate the list with a new random set
   if (!n.current.length) {
     resetRandomList();
   }
 
   // log a name from the random list
-  console.log(n.current.pop());
+  name = n.current.pop();
+  if (cb) {
+    cb(null, name);
+  } else {
+    console.log(name);
+  }
+  fs.writeFile(path.join(__dirname, 'name.json'), JSON.stringify({'name':name}), () => {
+
+  });
   save(n);
 };
+
+
+module.exports = lpop;
