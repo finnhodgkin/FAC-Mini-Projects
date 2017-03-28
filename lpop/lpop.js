@@ -15,58 +15,64 @@ cl.version('0.0.1')
   .option('-s, --setlist')
   .parse(process.argv);
 
-// ---- Check for arguments ---- //
-if (cl.add) {
-  add(cl.add);
+  const lpop = {};
 
-} else if (cl.remove) {
-  remove(cl.remove);
-
-} else if (cl.print) {
-  console.log(n.list);
-
-} else if (cl.setlist) {
-  resetRandomList();
-  save(n, 'Re-randomised lpop list.');
-
-} else {
-  lpop()
-}
-
-// ---- lpop functionality below ---- //
-function add (name) {
-  n.list.push(name);
-  resetRandomList();
-  save(n, `'${name}' added to the lpop list.`);
-}
-
-function remove (name) {
-  const index = n.list.indexOf(name);
-  if (index !== -1) {
-    n.list.splice(index, 1);
-    resetRandomList();
-    save(n, `'${name}' removed from the lpop list.`);
-
-  } else {
-    console.log(`Sorry, '${name}' is not on the lpop list.`);
+  // save lists to JSON file
+  lpop.save = (json, message) => {
+    fs.writeFile(path.join(__dirname, 'names.json'), JSON.stringify(json), () => {
+      if (message) { console.log(message); }
+    });
   }
-}
 
-function resetRandomList () {
+
+lpop.resetRandomList = () => {
   n.current = shuffle(n.list);
 }
 
-// save lists to JSON file
-function save (json, message) {
-  fs.writeFile(path.join(__dirname, 'names.json'), JSON.stringify(json), () => {
-    if (message) { console.log(message); }
-  });
+lpop.add = (name, cb) => {
+  if (!name && cb) cb(new Error('Invalid name!'));
+
+  n.list.push(name);
+  lpop.resetRandomList();
+
+  if (cb) {
+    lpop.save(n);
+    cb(null, `'${name}' added to the lpop list.`)
+
+  } else {
+    lpop.save(n, `'${name}' added to the lpop list.`);
+
+  }
 }
 
-function lpop (cb) {
+lpop.remove = (name, cb) => {
+  if (!name && cb) cb(new Error('Invalid name!'));
+
+  const index = n.list.indexOf(name);
+
+  if (index !== -1) {
+    n.list.splice(index, 1);
+    lpop.resetRandomList();
+
+    if (cb) {
+      cb(null, `'${name}' removed from the lpop list.`);
+      lpop.save(n);
+    }
+    else {
+      lpop.save(n, `'${name}' removed from the lpop list.`);
+    }
+
+  } else {
+    if (cb) cb(null, `'${name}' is not on the lpop list.`);
+    else console.log(`Sorry, '${name}' is not on the lpop list.`);
+
+  }
+}
+
+lpop.getName = (cb) => {
   // when no more random name repopulate the list with a new random set
   if (!n.current.length) {
-    resetRandomList();
+    lpop.resetRandomList();
   }
 
   // log a name from the random list
@@ -79,8 +85,26 @@ function lpop (cb) {
   fs.writeFile(path.join(__dirname, 'name.json'), JSON.stringify({'name':name}), () => {
 
   });
-  save(n);
+  lpop.save(n);
 };
 
 
 module.exports = lpop;
+
+// ---- Check for arguments ---- //
+if (cl.add) {
+  lpop.add(cl.add);
+
+} else if (cl.remove) {
+  lpop.remove(cl.remove);
+
+} else if (cl.print) {
+  console.log(n.list);
+
+} else if (cl.setlist) {
+  lpop.resetRandomList();
+  lpop.save(n, 'Re-randomised lpop list.');
+
+} else {
+  lpop.getName()
+}

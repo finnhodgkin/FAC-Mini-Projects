@@ -6,6 +6,8 @@ const router = (req, res) => {
 
   const api = {
     '/lpop' : handler.lpop,
+    '/add' : handler.lpopAdd,
+    '/remove' : handler.lpopRemove
   }[pathname];
 
   // ROUTES:
