@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 const lpop = require('./../lpop');
 
 const handler = {};
@@ -22,13 +23,40 @@ handler.socket = (socket) => {
 }
 
 handler.lpop = (req, res) => {
-  lpop((err, name) => {
+  lpop.getName((err, name) => {
     res.writeHead(200, {'Content-Type': 'text/html'});
     sockets.forEach(e => {
       e.emit('test', { n:name });
     });
     res.end(name);
   });
+}
+
+handler.lpopAdd = (req, res) => {
+  apply(req, res, lpop.add);
+
+}
+
+handler.lpopRemove = (req, res) => {
+  apply(req, res, lpop.remove);
+
+}
+
+function apply(req, res, func) {
+  const query = url.parse(req.url, true).query;
+  if (query.q) {
+    const name = query.q.replace(/[^a-z]/gi, '');
+    func(name, (err, message) => {
+      if (err) {
+        handler.serveError(req, res, err);
+        return;
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.end(message);
+    });
+  } else {
+    handler.serveError(req, res, new Error('Invalid query'));
+  }
 }
 
 handler.serveError = (req, res, err) => {
