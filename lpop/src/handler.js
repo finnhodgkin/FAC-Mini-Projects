@@ -11,9 +11,22 @@ handler.serveLanding = (req, res) => {
   });
 }
 
+const sockets = [];
+
+handler.socket = (socket) => {
+  fs.readFile(path.join(__dirname, '..', 'name.json'), 'utf8', (err, file) => {
+    const name = JSON.parse(file).name;
+    socket.emit('test', {n: name});
+  });
+  sockets.push(socket);
+}
+
 handler.lpop = (req, res) => {
   lpop((err, name) => {
     res.writeHead(200, {'Content-Type': 'text/html'});
+    sockets.forEach(e => {
+      e.emit('test', { n:name });
+    });
     res.end(name);
   });
 }
