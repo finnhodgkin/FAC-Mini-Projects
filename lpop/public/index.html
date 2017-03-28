@@ -29,6 +29,9 @@
     socket.on('test', function (data) {
       document.getElementById('lpop').innerText = data.n;
     });
+    socket.on('test2', function (data) {
+      console.log(data);
+    });
   </script>
 </body>
 </html>
