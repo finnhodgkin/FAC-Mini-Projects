@@ -5,6 +5,6 @@ module.exports = {
     auth: { mode: 'try' },
   },
   handler: (req, reply) => {
-    reply.view('login', null, { layout: 'admin' })
+    reply.view('login')
   },
 }
