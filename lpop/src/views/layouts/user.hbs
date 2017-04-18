@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>lPop</title>
+  <title>LPop</title>
   <link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
   <style>
     #lpop {
@@ -22,16 +23,6 @@
   </style>
 </head>
 <body>
-  <div id="lpop"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
-  <script>
-    var socket = io();
-    socket.on('test', function (data) {
-      document.getElementById('lpop').innerText = data.n;
-    });
-    socket.on('test2', function (data) {
-      console.log(data);
-    });
-  </script>
+  {{{content}}}
 </body>
 </html>

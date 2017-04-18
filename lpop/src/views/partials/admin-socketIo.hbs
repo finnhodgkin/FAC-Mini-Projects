@@ -1,0 +1,15 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+<script>
+  var socket = io();
+
+  socket.on('name', function (data) {
+    document.getElementById('lpop').innerText = data.n;
+  })
+
+  const getName = document.getElementById('getName');
+
+  getName.addEventListener('click', (event) => {
+    socket.emit('requestName', { n: true })
+  })
+
+</script>

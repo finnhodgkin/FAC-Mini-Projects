@@ -1,14 +1,39 @@
-const http = require('http');
-const port = process.env.PORT || 4000;
-const router = require('./router');
-const handler = require('./handler');
+// Create hapi server
+const hapi = require('hapi')
+const server = new hapi.Server()
 
-const server = http.createServer(router);
+// Private server config variables
+require('env2')('config.env')
 
-const io = require('socket.io')(server);
+// Hapi plugins
+const inert = require('inert')
+const vision = require('vision')
+const cookieAuthModule = require('hapi-auth-cookie')
+const contextCredentials = require('hapi-context-credentials')
 
-server.listen(port, () => {
-  console.log('server is listening on port: ', port);
-});
+// Route and view setup
+const routes = require('./routes')
+const handlebars = require('./handlebars')
 
-io.on('connection', handler.socket);
+server.connection({
+  port: process.env.PORT || 4000,
+})
+
+server.register([inert, vision, cookieAuthModule, contextCredentials], err => {
+  if (err) throw err
+
+  server.auth.strategy('base', 'cookie', 'required', {
+    password: process.env.COOKIE_PASSWORD,
+    cookie: 'mmedium-cookie',
+    isSecure: process.env.NODE_ENV !== 'dev',
+    ttl: 24 * 60 * 60 * 1000,
+    redirectTo: '/',
+    redirectOnTry: false,
+    isSameSite: false,
+  })
+
+  server.views(handlebars)
+  server.route(routes)
+})
+
+module.exports = server;
