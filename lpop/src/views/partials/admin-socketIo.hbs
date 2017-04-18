@@ -1,0 +1,110 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+<script>
+  var socket = io();
+
+  var fetchJson = function(url, method, cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        var contentType = xhr.getResponseHeader('content-type');
+        if (xhr.status === 200 && contentType.indexOf('json' > -1)) {
+          cb(null, JSON.parse(xhr.responseText));
+        } else {
+          cb(new Error('Error getting data from the server'));
+        }
+      }
+    };
+    xhr.open(method, url, true);
+    xhr.send();
+  };
+
+  var uncheckAll = function () {
+    const checked = [].slice.call(document.querySelectorAll('.checked'));
+    checked.forEach(function (element) {
+       element.className = 'unchecked';
+    });
+  }
+
+  socket.on('name', function (data) {
+    document.getElementById('lpop').innerText = data.n;
+    if (data.id) {
+      document.getElementById('user-' + data.id).className = 'checked';
+      if (!document.querySelector('.unchecked')) {
+        uncheckAll();
+        document.getElementById('user-' + data.id).className = 'checked';
+      }
+    }
+  })
+
+  var resetNames = document.getElementById('resetNames');
+  resetNames.addEventListener('click', function() {
+    fetchJson('/reset', 'PUT', function(err, response) {
+      if(err) return console.log(err)
+      uncheckAll();
+    })
+  })
+
+  var getName = document.getElementById('getName');
+  getName.addEventListener('click', function() {
+    socket.emit('requestName', { n: true })
+  })
+
+  var deleteEntry = function(link) {
+    return function(event) {
+      event.preventDefault();
+      fetchJson('/delete/' + link.id, 'DELETE', function(err, response) {
+        if (err) return console.log(err);
+
+        if (response.success) {
+          this.removeEventListener('click', arguments.callee);
+          var li = link.parentNode;
+          li.parentNode.removeChild(li);
+
+        } else {
+          console.log('Something went wrong on the server.')
+
+        }
+      });
+    };
+  };
+
+  var close = [].slice.call(document.querySelectorAll('.remove'));
+  close.forEach(function(link) {
+    link.addEventListener('click', deleteEntry.call(null, link));
+  });
+
+  var addNameToList = function(name, id) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = 'remove';
+    a.className = 'remove';
+    a.id = id;
+    a.innerText = 'x';
+    a.addEventListener('click', deleteEntry.call(null, a));
+    var span = document.createElement('span');
+    span.className = 'unchecked';
+    span.id = 'user-' + id;
+    span.innerText = ' ' + name;
+    var ul = document.getElementById('userList');
+
+    li.appendChild(a);
+    li.appendChild(span);
+    ul.appendChild(li);
+  }
+
+  var addNameForm = document.getElementById('addNameForm');
+  addNameForm.addEventListener('submit', function(event){
+    event.preventDefault();
+    if (event.target[0].value) {
+      var name = event.target[0].value;
+      fetchJson('/add/' + name, 'POST', function(err, res) {
+        if (res.error || err) { console.log('Failed to add name to list'); }
+
+        addNameToList(name, res.id);
+      })
+
+    };
+  });
+
+
+</script>

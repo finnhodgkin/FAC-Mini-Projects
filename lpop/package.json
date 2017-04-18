@@ -4,9 +4,9 @@
   "description": "",
   "main": "lpop.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server",
-    "devStart": "nodemon src/server"
+    "test": "node tests/test",
+    "start": "node src/start",
+    "devStart": "nodemon src/start -e js,hbs,css"
   },
   "preferGlobal": "true",
   "bin": {
@@ -15,7 +15,21 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "commander": "^2.9.0",
-    "socket.io": "^1.7.3"
+    "env2": "^2.1.1",
+    "handlebars": "^4.0.6",
+    "hapi": "^16.1.1",
+    "hapi-auth-cookie": "^7.0.0",
+    "hapi-context-credentials": "^2.0.0",
+    "inert": "^4.2.0",
+    "pg": "^6.1.5",
+    "socket.io": "^1.7.3",
+    "vision": "^4.1.1"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.3"
   }
 }
