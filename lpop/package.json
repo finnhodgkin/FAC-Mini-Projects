@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node tests/test",
     "start": "node src/start",
-    "devStart": "nodemon src/start"
+    "devStart": "nodemon src/start -e js,hbs,css"
   },
   "preferGlobal": "true",
   "bin": {

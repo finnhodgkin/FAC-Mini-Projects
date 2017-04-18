@@ -1,16 +1,22 @@
 BEGIN;
 
-DROP TABLE IF EXISTS auth, lpop CASCADE;
+DROP TABLE IF EXISTS auth, lpop, current CASCADE;
 
 CREATE TABLE lpop (
   id    SERIAL       PRIMARY KEY,
-  name  VARCHAR(20)  NOT NULL
+  name  VARCHAR(20)  NOT NULL,
+  selected BOOLEAN
 );
 
 CREATE TABLE auth (
   id        SERIAL      PRIMARY KEY,
   username  VARCHAR(20) UNIQUE,
   password  VARCHAR(70) NOT NULL
+);
+
+CREATE TABLE current (
+  id        SERIAL      PRIMARY KEY,
+  name  VARCHAR(20) NOT NULL
 );
 
 INSERT INTO auth(username, password)
@@ -22,5 +28,9 @@ VALUES
 ('finn'), ('oli'), ('jessica'), ('akin'), ('antonio'), ('lucy'), ('alexis'),
 ('yvonne'), ('piotr'), ('joey'), ('alice'), ('samatar'), ('philippa'), ('maja'),
 ('martha'), ('zooey');
+
+INSERT INTO current(name)
+VALUES
+('finn');
 
 COMMIT;

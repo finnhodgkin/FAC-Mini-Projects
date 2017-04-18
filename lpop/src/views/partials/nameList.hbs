@@ -1,0 +1,10 @@
+{{#if names}}
+<ul id="userList">
+{{#each names}}
+  <li>
+    <a href="remove" class="remove" id="{{id}}">x</a>
+    <span id="user-{{id}}" class="{{#if selected}}checked{{else}}unchecked{{/if}}">{{name}}</span>
+  </li>
+{{/each}}
+</ul>
+{{/if}}

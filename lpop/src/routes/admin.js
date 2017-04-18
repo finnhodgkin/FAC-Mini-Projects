@@ -1,7 +1,12 @@
+const lpop = require('./../lib/lpop');
+
 module.exports = {
   method: 'GET',
   path: '/admin',
   handler: (req, reply) => {
-    reply.view('admin', null, { layout: 'admin' })
+    lpop.list((err, list) => {
+
+      reply.view('admin', { names: list }, { layout: 'admin' })
+    })
   },
 }

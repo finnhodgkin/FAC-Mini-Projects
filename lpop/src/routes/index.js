@@ -3,4 +3,7 @@ module.exports = [
   './admin',
   './login',
   './login-post',
+  './delete',
+  './add',
+  './reset',
 ].map(require)
