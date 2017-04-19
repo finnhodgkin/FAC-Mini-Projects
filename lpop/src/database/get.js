@@ -2,7 +2,7 @@ connect = require('./connect')
 
 const get = {}
 
-get.names = (callback) => {
+get.getNames = (callback) => {
   connect.query(`SELECT name, selected, id FROM lpop;`, (err, { rows: names }) => {
 
     err ? callback(err) :
@@ -13,10 +13,10 @@ get.names = (callback) => {
   })
 }
 
-get.current = (callback) => {
-  connect.query(`SELECT name FROM current;`, (err, {rows: name }) => {
+get.getCurrent = (callback) => {
+  connect.query(`SELECT name FROM current;`, (err, res) => {
     // Get current name
-    err ? callback(err) : callback(null, name[0].name)
+    err ? callback(err) : callback(null, res.rows[0].name)
   })
 }
 
