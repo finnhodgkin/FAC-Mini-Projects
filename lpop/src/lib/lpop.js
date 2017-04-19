@@ -1,15 +1,15 @@
-const get = require('./../database/get');
-const post = require('./../database/post');
-const del = require('./../database/del');
+const {getNames, getCurrent} = require('./../database/get');
+const {reset, addName, tick, setCurrent} = require('./../database/post');
+const {deleteName} = require('./../database/del');
 
 const lpop = {}
 
 lpop.pop = callback => {
-  get.names((err, names) => {
+  getNames((err, namesArr) => {
     if (err) return callback(new Error('Error connecting to database'))
 
     // Only use names that haven't been selected
-    const unselected = names.filter(name => !name.selected)
+    const unselected = namesArr.filter(name => !name.selected)
     // Pick a random unselected name or set null if all names are selected
     const name = unselected[0] ?
       unselected[Math.floor(Math.random() * unselected.length)] :
@@ -25,18 +25,18 @@ lpop.pop = callback => {
   })
 }
 
-lpop.reset = callback => post.reset(callback)
+lpop.reset = callback => reset(callback)
 
-lpop.list = callback => get.names(callback)
+lpop.list = callback => getNames(callback)
 
-lpop.add = (name, callback) => post.name(name, callback)
+lpop.add = (nameToAdd, callback) => addName(nameToAdd, callback)
 
-lpop.remove = (name, callback) => del.name(name, callback)
+lpop.remove = (name, callback) => deleteName(name, callback)
 
 lpop.setCurrent = (name) => {
-  post.tick(name, (err, res) => err ? console.log(err) : post.current(name))
+  tick(name, (err, res) => err ? console.log(err) : setCurrent(name))
 }
 
-lpop.getCurrent = callback => get.current(callback)
+lpop.getCurrent = callback => getCurrent(callback)
 
 module.exports = lpop

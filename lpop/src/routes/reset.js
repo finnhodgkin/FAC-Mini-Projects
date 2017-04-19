@@ -5,7 +5,7 @@ module.exports = {
   path: '/reset',
   handler: (req, reply) => {
     lpop.reset((err, res) => {
-      console.log(err, res)
+      err ? console.log(err) : console.log(res)
       return err ? reply({error: 'Failed to reset'}) : reply({success: true})
     })
   },
