@@ -46,6 +46,6 @@ const ResetButton = styled.button`
 
 export const LpopReset = (props) => {
   return (
-    <ResetButton onClick={() => { props.handleReset() } }>Reset</ResetButton>
+    <ResetButton onClick={() => { props.handleReset(true) } }>Reset</ResetButton>
   )
 }

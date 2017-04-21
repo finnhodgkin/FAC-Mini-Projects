@@ -20,4 +20,10 @@ get.getCurrent = (callback) => {
   })
 }
 
+get.allPop = (callback) => {
+  connect.query('SELECT allp FROM allpop;', (err, res) => {
+    err ? callback(err) : callback(null, res.rows[0].allp)
+  })
+}
+
 module.exports = get

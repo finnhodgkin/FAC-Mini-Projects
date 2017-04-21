@@ -7,7 +7,7 @@ const NameItem = styled.li`
   list-style: none;
   margin: 0 auto;
   padding: .5rem 0;
-  background-color: ${props => props.isChecked ? '#375873' : '#31516a'};
+  background-color: ${props => props.selected ? '#375873' : '#31516a'};
   border-bottom: .125rem solid #486e8c;
   &:last-child {
     border-bottom: none;
@@ -15,7 +15,7 @@ const NameItem = styled.li`
 `
 
 const Name = styled.span`
-  text-decoration: ${props => props.isChecked ? 'line-through' : 'none'};
+  text-decoration: ${props => props.selected ? 'line-through' : 'none'};
   font-size: 1.3rem;
   color: white;
 `
@@ -69,9 +69,9 @@ export const LpopListItem = (props) => {
   const toggleCheck = partial(props.handleToggleCheck, props.id)
   const remove = partial(props.handleRemove, props.id)
   return (
-    <NameItem onClick={toggleCheck} isChecked={props.isChecked}>
+    <NameItem onClick={toggleCheck} selected={props.selected}>
       <RemoveName onClick={remove} href="#">X</RemoveName>
-      <Name isChecked={props.isChecked}>{props.name}</Name>
+      <Name selected={props.selected}>{props.name}</Name>
     </NameItem>
   )
 }

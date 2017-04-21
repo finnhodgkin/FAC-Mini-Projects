@@ -14,13 +14,17 @@ const NameList = styled.ul`
 export const LpopList = (props) => {
   const unchecked = getUnchecked(props.names)
   const checked = getChecked(props.names)
+  const sortAlpha = ({name: a}, {name: b}) => {
+    const [first, second] = [a.toLowerCase(), b.toLowerCase()]
+    return first !== second ? first < second ? -1 : 1 : 0
+  }
   return (
     <NameList>
-      {unchecked.map(name => <LpopListItem {...name}
+      {unchecked.sort(sortAlpha).map(name => <LpopListItem {...name}
         handleToggleCheck={props.handleToggleCheck}
         handleRemove={props.handleRemove}
         key={name.id}/>)}
-      {checked.map(name => <LpopListItem {...name}
+      {checked.sort(sortAlpha).map(name => <LpopListItem {...name}
         handleToggleCheck={props.handleToggleCheck}
         handleRemove={props.handleRemove}
         key={name.id}/>)}

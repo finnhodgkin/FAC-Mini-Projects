@@ -1,6 +1,6 @@
 BEGIN;
 
-DROP TABLE IF EXISTS auth, lpop, current CASCADE;
+DROP TABLE IF EXISTS auth, lpop, current, allpop CASCADE;
 
 CREATE TABLE lpop (
   id    SERIAL       PRIMARY KEY,
@@ -19,6 +19,11 @@ CREATE TABLE current (
   name  VARCHAR(20) NOT NULL
 );
 
+CREATE TABLE allpop (
+  id     SERIAL    PRIMARY KEY,
+  allp   BOOLEAN   NOT NULL
+);
+
 INSERT INTO auth(username, password)
 VALUES
 ('mentor', '$2a$10$JshaW9.JENpgZwoGwN.I7.Tx2vh.s3KNgsi3f6QU.DMYKtoVv8PIm');
@@ -32,5 +37,9 @@ VALUES
 INSERT INTO current(name)
 VALUES
 ('finn');
+
+INSERT INTO allpop (allp)
+VALUES
+(FALSE);
 
 COMMIT;
