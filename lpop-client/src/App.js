@@ -1,8 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import styled from 'styled-components'
 
-import {LpopStick, LpopGet, LpopAdd, LpopList, LpopReset} from './components/lpop-admin'
-import {getUnchecked, check, uncheckAll, validateAdd, updateList, findById, toggleCheck, addName, removeName, generateId} from './lib/lpop/lpopHelpers'
+import io from 'socket.io-client'
+const socket = io()
+
+import {LpopStick, LpopGet, LpopAdd,
+  LpopList, LpopReset, LpopSwitch} from './components/lpop-admin'
+import {getUnchecked, check, uncheckAll, validateAdd,
+  updateList, findById, toggleCheck, addName,
+  removeName, generateId, updateById} from './lib/lpop/lpopHelpers'
+import {partial} from './lib/utils'
+import {getNames, addNameToDb, removeFromDb, setAllPop, checkId, setName} from './lib/lpop/lpopServer'
 
 const AppContainer = styled.section`
   max-width: 90%;
@@ -32,28 +40,56 @@ const CenterControls = styled.section`
 
 class App extends Component {
   state = {
-    currentName: 'Finn',
-    names: [
-      { name: 'Finn', id: 1, isChecked: true },
-      { name: 'Tom', id: 2, isChecked: false },
-      { name: 'Dick', id: 3, isChecked: false },
-      { name: 'Harry', id: 4, isChecked: false },
-    ],
+    currentName: '',
+    names: [],
     newName: '',
+    allUsers: true,
   }
 
-  handleReset = (callback) => {
-    const list = uncheckAll(this.state.names);
+
+  handleNewName = ({n, id}, callback) => {
+    if (id) {
+      const name = check(findById(this.state.names, id))
+      const updatedList = updateList(this.state.names, name)
+      this.setState({currentName: n, names: updatedList})
+    } else {
+      this.setState({currentName: n})
+    }
+  }
+
+  handleAllPop = ({n, id}, callback) => {
+    if (!getUnchecked(this.state.names)[0]) {
+      return this.handleReset(false, partial(this.handleAllPop, {n, id}))
+    }
+    this.handleName({n, id}, callback)
+  }
+
+  componentDidMount() {
+    getNames((err, { names }) => this.setState({names}))
+    socket.on('allName', this.handleAllPop)
+    socket.on('name', this.handleNewName)
+    socket.on('reset', () => this.handleReset(false))
+    socket.on('update', () => getNames((err, {names}) => this.setState({names})))
+  }
+
+  handleReset = (shouldEmmit, callback) => {
+    const list = uncheckAll(this.state.names)
     callback ?
       this.setState({names: list}, callback) :
       this.setState({names: list})
+    shouldEmmit ?
+      socket.emit('reset', {yes: true}) : ''
   }
 
   handleToggleCheck = (id) => {
     const name = findById(this.state.names, id)
     const toggled = toggleCheck(name)
     const updated = updateList(this.state.names, toggled)
-    this.setState({names: updated})
+    this.setState({names: updated}, () => {
+      checkId(id, toggled.selected, (err) => {
+        err ? console.log(err) : socket.emit('update')
+      })
+    })
   }
 
   handleRemove = (id, event) => {
@@ -61,14 +97,23 @@ class App extends Component {
     event.stopPropagation()
     const updated = removeName(this.state.names, id)
     this.setState({names: updated})
+    removeFromDb(id, (err, res) => {
+      if (err) return console.log(err)
+      socket.emit('update')
+    })
   }
 
   handleAdd = (event) => {
     event.preventDefault()
-    const id = generateId()
-    const newName = { name: this.state.newName, id: id, isChecked: false }
+    const randomId = generateId()
+    const newName = { name: this.state.newName, id: randomId, selected: false }
     const names = addName(this.state.names, newName)
-    this.setState({names})
+    this.setState({names, newName: ''})
+
+    addNameToDb(newName.name, (err, { id }) => {
+      if (err) return console.log(err)
+      socket.emit('update')
+    })
   }
 
   handleEmptyAdd = (event) => event.preventDefault()
@@ -82,21 +127,37 @@ class App extends Component {
     if (!this.state.names[0]) return;
     const list = getUnchecked(this.state.names)
     // Reset automatically when no more unchecked
-    if (!list[0]) return this.handleReset(this.handlePop)
+    if (!list[0]) return this.handleReset(true, this.handlePop)
     // Pick a random name and check it off the list
     const name = list[Math.floor(Math.random() * list.length)]
     const updatedList = updateList(this.state.names, check(name))
     this.setState({currentName: name.name, names: updatedList})
+    socket.emit('name', {n: name.name, id: name.id})
+    // Set current name on the database
+    setName(name.name)
+  }
+
+  handleSwitch = () => {
+    this.setState({allUsers: !this.state.allUsers}, () => {
+      setAllPop(this.state.allUsers, (err, res) => {
+        err ? console.log(err) : socket.emit('allPop')
+      })
+    })
   }
 
   render() {
-    const add = validateAdd(this.state.newName) ? this.handleAdd : this.handleEmptyAdd
+    const add = validateAdd(this.state.newName) ?
+      this.handleAdd :
+      this.handleEmptyAdd
     return (
       <AppContainer>
         <LpopStick currentName={this.state.currentName}/>
         <LpopAdmin>
           <ControlContainer>
             <CenterControls>
+              <LpopSwitch
+                on={this.state.allUsers}
+                handleSwitch={this.handleSwitch}/>
               <LpopGet handlePop={this.handlePop}/>
               <LpopReset handleReset={this.handleReset}/>
             </CenterControls>

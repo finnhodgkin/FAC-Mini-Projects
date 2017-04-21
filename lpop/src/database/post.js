@@ -22,9 +22,27 @@ post.tick = (name, callback) => {
   })
 }
 
+post.tickById = (id, callback) => {
+  connect.query(`UPDATE lpop SET selected = true WHERE id = $1;`, [id], (err) => {
+    err ? callback(err) : callback(null, 'Checked off that id!')
+  })
+}
+
+post.toggleTickById = (id, isOn, callback) => {
+  connect.query(`UPDATE lpop SET selected = $1 WHERE id = $2;`, [isOn, id], (err) => {
+    err ? callback(err) : callback(null, isOn ? `Checked ${id}` : `Unchecked ${id}`)
+  })
+}
+
 post.reset = (callback) => {
   connect.query(`UPDATE lpop SET selected = false;`, (err) => {
     err ? callback(err) : callback(null, 'Reset all names')
+  })
+}
+
+post.allPop = (isOn, callback) => {
+  connect.query('UPDATE allpop SET allp = $1;', [isOn], (err) => {
+    err ? callback(err) : callback(null, isOn ? 'Allpop engaged!' : 'Allpop disengaged.')
   })
 }
 
