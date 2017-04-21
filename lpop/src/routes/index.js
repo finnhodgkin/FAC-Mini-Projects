@@ -9,6 +9,7 @@ module.exports = [
   './reset',
   './names',
   './toggle-all-pop',
+  './all-pop',
   './check',
   './set-current',
 ].map(require)

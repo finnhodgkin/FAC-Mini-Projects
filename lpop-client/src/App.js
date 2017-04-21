@@ -10,7 +10,7 @@ import {getUnchecked, check, uncheckAll, validateAdd,
   updateList, findById, toggleCheck, addName,
   removeName, generateId, updateById} from './lib/lpop/lpopHelpers'
 import {partial} from './lib/utils'
-import {getNames, addNameToDb, removeFromDb, setAllPop, checkId, setName} from './lib/lpop/lpopServer'
+import {getNames, addNameToDb, removeFromDb, setAllPop, checkId, setName, getAllPop} from './lib/lpop/lpopServer'
 
 const AppContainer = styled.section`
   max-width: 90%;
@@ -47,7 +47,7 @@ class App extends Component {
   }
 
 
-  handleNewName = ({n, id}, callback) => {
+  handleNewName = ({n, id}, callback) => {
     if (id) {
       const name = check(findById(this.state.names, id))
       const updatedList = updateList(this.state.names, name)
@@ -61,7 +61,7 @@ class App extends Component {
     if (!getUnchecked(this.state.names)[0]) {
       return this.handleReset(false, partial(this.handleAllPop, {n, id}))
     }
-    this.handleName({n, id}, callback)
+    this.handleNewName({n, id}, callback)
   }
 
   componentDidMount() {
@@ -69,7 +69,9 @@ class App extends Component {
     socket.on('allName', this.handleAllPop)
     socket.on('name', this.handleNewName)
     socket.on('reset', () => this.handleReset(false))
+    socket.on('allPop', ({on}) => this.setState({allUsers: on}))
     socket.on('update', () => getNames((err, {names}) => this.setState({names})))
+    getAllPop((err, { allUsers }) => this.setState({allUsers}))
   }
 
   handleReset = (shouldEmmit, callback) => {
