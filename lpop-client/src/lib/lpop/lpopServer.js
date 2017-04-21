@@ -16,6 +16,8 @@ const fetch = (url, method, cb) => {
 
 export const getNames = (callback) => fetch('/names', 'GET', callback)
 
+export const getAllPop = (callback) => fetch('/all-pop', 'GET', callback)
+
 export const addNameToDb = (name, cb) => fetch('/add/' + name, 'POST', cb)
 
 export const removeFromDb = (id, cb) => fetch('/delete/' + id, 'DELETE', cb)
