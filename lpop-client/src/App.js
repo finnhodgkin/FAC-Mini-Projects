@@ -79,8 +79,7 @@ class App extends Component {
     callback ?
       this.setState({names: list}, callback) :
       this.setState({names: list})
-    shouldEmmit ?
-      socket.emit('reset', {yes: true}) : ''
+    if (shouldEmmit) socket.emit('reset', {yes: true})
   }
 
   handleToggleCheck = (id) => {
@@ -114,6 +113,8 @@ class App extends Component {
 
     addNameToDb(newName.name, (err, { id }) => {
       if (err) return console.log(err)
+      const updated = updateById(this.state.names, randomId, {...newName, id})
+      this.setState({names: updated})
       socket.emit('update')
     })
   }
