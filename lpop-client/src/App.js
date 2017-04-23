@@ -58,7 +58,7 @@ class App extends Component {
   }
 
   handleAllPop = ({n, id}, callback) => {
-    if (!getUnchecked(this.state.names)[0]) {
+    if (!getUnchecked(this.state.names)[0] && findById(this.state.names, id)) {
       return this.handleReset(false, partial(this.handleAllPop, {n, id}))
     }
     this.handleNewName({n, id}, callback)
