@@ -12,4 +12,5 @@ module.exports = [
   './all-pop',
   './check',
   './set-current',
+  './api',
 ].map(require)
