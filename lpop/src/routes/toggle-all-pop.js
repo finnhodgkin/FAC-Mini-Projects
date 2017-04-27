@@ -1,7 +1,7 @@
 const { allPop } = require('./../database/post')
 
 module.exports = {
-  method: 'put',
+  method: 'PUT',
   path: '/all-pop/{allPop}',
   handler: (req, reply) => {
     allPop(req.params.allPop, (err) => {
