@@ -5,11 +5,11 @@ const {deleteName} = require('./../database/del');
 const lpop = {}
 
 lpop.pop = callback => {
-  getNames((err, namesArr) => {
+  getNames((err, {names}) => {
     if (err) return callback(new Error('Error connecting to database'))
 
     // Only use names that haven't been selected
-    const unselected = namesArr.filter(name => !name.selected)
+    const unselected = names.filter(name => !name.selected)
     // Pick a random unselected name or set null if all names are selected
     const name = unselected[0] ?
       unselected[Math.floor(Math.random() * unselected.length)] :

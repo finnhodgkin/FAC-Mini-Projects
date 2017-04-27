@@ -7,8 +7,8 @@ module.exports = {
     auth: { mode: 'optional' },
   },
   handler: (req, reply) => {
-    lpop.list((err, list) => {
-      err ? reply({ error: 'SORRY' }) : reply({ names: list })
+    lpop.list((err, { names }) => {
+      err ? reply({ error: 'SORRY' }) : reply({ names })
     })
   },
 }
